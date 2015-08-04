@@ -2,6 +2,9 @@ const NENEMIES = 4;
 const MAX_SPEED = 10;
 const MIN_SPEED = 4;
 
+const MAX_POS = 606*0.6;
+const MIN_POS = 606*0.1;
+
 // Entity (superclass of enemies and player)
 var Entity = function(sprite, pos) {
     this.sprite = sprite;
@@ -18,6 +21,7 @@ Entity.prototype.render = function() {
 var Enemy = function(sprite, pos, speed) {
     Entity.call(this, sprite, pos);
     this.speed = Math.random() * (MAX_SPEED - MIN_SPEED) + MIN_SPEED;
+    this.pos[1] = Math.random() * (MAX_POS - MIN_POS) + MIN_POS;
 }
 
 Enemy.prototype = Object.create(Entity.prototype);
@@ -27,6 +31,7 @@ Enemy.prototype.update = function(dt) {
     if (this.pos[0] > 505) {
         this.pos[0] = 0;
         this.speed = Math.random() * (MAX_SPEED - MIN_SPEED) + MIN_SPEED;
+        this.pos[1] = Math.random() * (MAX_POS - MIN_POS) + MIN_POS;
     }
 }
 
