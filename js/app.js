@@ -1,6 +1,6 @@
 const NENEMIES = 4;
-const MAX_SPEED = 10;
-const MIN_SPEED = 4;
+const MAX_SPEED = 7;
+const MIN_SPEED = 3;
 
 const MAX_POS = 606*0.6;
 const MIN_POS = 606*0.1;
