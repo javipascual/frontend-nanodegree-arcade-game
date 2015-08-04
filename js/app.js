@@ -44,8 +44,8 @@ Player.prototype = Object.create(Entity.prototype);
 
 Player.prototype.update = function(dt) {
   if (this.dir[0]!=0 || this.dir[1]!=0) {
-    this.pos[0] += this.dir[0]*this.speed;
-    this.pos[1] += this.dir[1]*this.speed;
+    this.pos[0] += this.dir[0];
+    this.pos[1] += this.dir[1];
     this.dir = [0,0];
   }
 }
