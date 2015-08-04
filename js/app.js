@@ -37,7 +37,8 @@ Enemy.prototype.update = function(dt) {
 
 // Player
 var Player = function(sprite, pos) {
-    Entity.call(this, sprite, pos);
+    Entity.call(this, sprite, [101*2, 83*5]);
+    this.dir = [0,0];
 }
 
 Player.prototype = Object.create(Entity.prototype);
@@ -48,6 +49,10 @@ Player.prototype.update = function(dt) {
     this.pos[1] += this.dir[1];
     this.dir = [0,0];
   }
+}
+
+Player.prototype.reset = function() {
+    this.pos = [101*2, 83*5];
 }
 
 Player.prototype.handleInput = function(key) {
@@ -72,7 +77,7 @@ Player.prototype.handleInput = function(key) {
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 
-player = new Player('images/char-boy.png', [101*2, 83*5]);
+player = new Player('images/char-boy.png');
 allEnemies = [];
 
 for (var i = 0; i < NENEMIES; i++)
