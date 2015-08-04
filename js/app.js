@@ -1,20 +1,12 @@
 const NENEMIES = 4;
+const MAX_SPEED = 10;
+const MIN_SPEED = 4;
 
 // Entity (superclass of enemies and player)
-var Entity = function(sprite, pos, speed) {
+var Entity = function(sprite, pos) {
     this.sprite = sprite;
     this.pos = pos;
-    this.speed = speed;
-
     this.dir = [0, 0];
-}
-
-Entity.prototype.update = function(dt) {
-  if (this.dir[0]!=0 || this.dir[1]!=0) {
-    this.pos[0] += this.dir[0]*this.speed;
-    this.pos[1] += this.dir[1]*this.speed;
-    this.dir = [0,0];
-  }
 }
 
 Entity.prototype.render = function() {
@@ -24,33 +16,49 @@ Entity.prototype.render = function() {
 
 // Enemies
 var Enemy = function(sprite, pos, speed) {
-    Entity.call(this, sprite, pos, speed);
+    Entity.call(this, sprite, pos);
+    this.speed = Math.random() * (MAX_SPEED - MIN_SPEED) + MIN_SPEED;
 }
 
 Enemy.prototype = Object.create(Entity.prototype);
 
+Enemy.prototype.update = function(dt) {
+    this.pos[0] += this.speed;
+    if (this.pos[0] > 505) {
+        this.pos[0] = 0;
+        this.speed = Math.random() * (MAX_SPEED - MIN_SPEED) + MIN_SPEED;
+    }
+}
 
 // Player
-var Player = function(sprite, pos, speed) {
-    Entity.call(this, sprite, pos, speed);
+var Player = function(sprite, pos) {
+    Entity.call(this, sprite, pos);
 }
 
 Player.prototype = Object.create(Entity.prototype);
+
+Player.prototype.update = function(dt) {
+  if (this.dir[0]!=0 || this.dir[1]!=0) {
+    this.pos[0] += this.dir[0]*this.speed;
+    this.pos[1] += this.dir[1]*this.speed;
+    this.dir = [0,0];
+  }
+}
 
 Player.prototype.handleInput = function(key) {
 
   switch(key) {
     case 'left':
-        this.dir = [-1, 0];
+        this.dir = [-101, 0];
         break;
     case 'up':
-        this.dir = [0, -1];
+        this.dir = [0, -83];
         break;
     case 'right':
-        this.dir = [1, 0];
+        this.dir = [101, 0];
         break;
     case 'down':
-        this.dir = [0, 1];
+        this.dir = [0, 83];
         break;
   }
 }
@@ -59,11 +67,11 @@ Player.prototype.handleInput = function(key) {
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 
-player = new Player('images/char-boy.png', [0, 0], 10);
+player = new Player('images/char-boy.png', [101*2, 83*5]);
 allEnemies = [];
 
 for (var i = 0; i < NENEMIES; i++)
-    allEnemies.push(new Enemy('images/enemy-bug.png', [(i+1)*100,i*100], 6));
+    allEnemies.push(new Enemy('images/enemy-bug.png', [0,(i+1)*83]));
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
