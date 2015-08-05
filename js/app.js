@@ -1,10 +1,3 @@
-const NENEMIES = 4;
-const MAX_SPEED = 7;
-const MIN_SPEED = 3;
-
-const MAX_POS = 606*0.6;
-const MIN_POS = 606*0.1;
-
 // Entity (superclass of enemies and player)
 var Entity = function(sprite, pos) {
     this.sprite = sprite;
@@ -20,8 +13,8 @@ Entity.prototype.render = function() {
 // Enemies
 var Enemy = function(sprite, pos, speed) {
     Entity.call(this, sprite, pos);
-    this.speed = Math.random() * (MAX_SPEED - MIN_SPEED) + MIN_SPEED;
-    this.pos[1] = Math.random() * (MAX_POS - MIN_POS) + MIN_POS;
+    this.speed = Math.random() * (appGlobals.MAX_SPEED - appGlobals.MIN_SPEED) + appGlobals.MIN_SPEED;
+    this.pos[1] = Math.random() * (appGlobals.MAX_POS - appGlobals.MIN_POS) + appGlobals.MIN_POS;
 }
 
 Enemy.prototype = Object.create(Entity.prototype);
@@ -30,14 +23,14 @@ Enemy.prototype.update = function(dt) {
     this.pos[0] += this.speed;
     if (this.pos[0] > 505) {
         this.pos[0] = 0;
-        this.speed = Math.random() * (MAX_SPEED - MIN_SPEED) + MIN_SPEED;
-        this.pos[1] = Math.random() * (MAX_POS - MIN_POS) + MIN_POS;
+        this.speed = Math.random() * (appGlobals.MAX_SPEED - appGlobals.MIN_SPEED) + appGlobals.MIN_SPEED;
+        this.pos[1] = Math.random() * (appGlobals.MAX_POS - appGlobals.MIN_POS) + appGlobals.MIN_POS;
     }
 }
 
 // Player
 var Player = function(sprite, pos) {
-    Entity.call(this, sprite, [101*2, 83*5]);
+    Entity.call(this, sprite, [appGlobals.BRICK_WIDTH*2, appGlobals.BRICK_HEIGHT*5]);
     this.dir = [0,0];
 }
 
@@ -52,23 +45,23 @@ Player.prototype.update = function(dt) {
 }
 
 Player.prototype.reset = function() {
-    this.pos = [101*2, 83*5];
+    this.pos = [appGlobals.BRICK_WIDTH*2, appGlobals.BRICK_HEIGHT*5];
 }
 
 Player.prototype.handleInput = function(key) {
 
   switch(key) {
     case 'left':
-        this.dir = [-101, 0];
+        this.dir = [-appGlobals.BRICK_WIDTH, 0];
         break;
     case 'up':
-        this.dir = [0, -83];
+        this.dir = [0, -appGlobals.BRICK_HEIGHT];
         break;
     case 'right':
-        this.dir = [101, 0];
+        this.dir = [appGlobals.BRICK_WIDTH, 0];
         break;
     case 'down':
-        this.dir = [0, 83];
+        this.dir = [0, appGlobals.BRICK_HEIGHT];
         break;
   }
 }
@@ -77,11 +70,11 @@ Player.prototype.handleInput = function(key) {
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 
-player = new Player('images/char-boy.png');
-allEnemies = [];
+var player = new Player('images/char-boy.png');
+var allEnemies = [];
 
-for (var i = 0; i < NENEMIES; i++)
-    allEnemies.push(new Enemy('images/enemy-bug.png', [0,(i+1)*83]));
+for (var i = 0; i < appGlobals.NENEMIES; i++)
+    allEnemies.push(new Enemy('images/enemy-bug.png', [0,(i+1)*appGlobals.BRICK_HEIGHT]));
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
