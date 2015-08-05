@@ -37,11 +37,14 @@ var Player = function(sprite, pos) {
 Player.prototype = Object.create(Entity.prototype);
 
 Player.prototype.update = function(dt) {
-  if (this.dir[0]!=0 || this.dir[1]!=0) {
-    this.pos[0] += this.dir[0];
-    this.pos[1] += this.dir[1];
+
+    if (this.pos[0]+this.dir[0]>=0 && this.pos[0]+this.dir[0]<appGlobals.WIDTH)
+        this.pos[0] += this.dir[0];
+
+    if (this.pos[1]+this.dir[1]>=appGlobals.BRICK_HEIGHT && this.pos[1]+this.dir[1]<appGlobals.HEIGHT-202)
+        this.pos[1] += this.dir[1];
+
     this.dir = [0,0];
-  }
 }
 
 Player.prototype.reset = function() {
