@@ -98,7 +98,7 @@ var Engine = (function(global) {
     function update(dt) {
         updateEntities(dt);
         checkCollisions();
-        if (player.lives==0)
+        if (player.lives<0)
             game_state = state.GAME_OVER;
     }
 
