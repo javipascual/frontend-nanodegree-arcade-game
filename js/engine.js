@@ -14,6 +14,12 @@
  * a little simpler to work with.
  */
 
+ state = {
+     RUN : 0,
+     GAME_OVER : 1,
+     SELECT_PLAYER : 2
+ }
+
 var Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
@@ -23,7 +29,8 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        lastTime;
+        lastTime,
+        game_state;
 
     canvas.width = appGlobals.WIDTH;
     canvas.height = appGlobals.HEIGHT;
@@ -45,8 +52,17 @@ var Engine = (function(global) {
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
          */
-        update(dt);
+        if (game_state === state.RUN) {
+            update(dt);
+        }
+
         render();
+
+        if (game_state === state.GAME_OVER) {
+            ctx.fillStyle = "blue";
+            ctx.font = "50px emulogic";
+            ctx.fillText("GAME OVER", 25, appGlobals.HEIGHT/2);
+        }
 
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
@@ -65,6 +81,7 @@ var Engine = (function(global) {
      */
     function init() {
         reset();
+        game_state = state.RUN;
         lastTime = Date.now();
         main();
     }
@@ -81,6 +98,8 @@ var Engine = (function(global) {
     function update(dt) {
         updateEntities(dt);
         checkCollisions();
+        if (player.lives==0)
+            game_state = state.GAME_OVER;
     }
 
     /* This is called by the update function  and loops through all of the
@@ -151,7 +170,6 @@ var Engine = (function(global) {
                 ctx.drawImage(Resources.get(rowImages[row]), col * appGlobals.BRICK_WIDTH, row * appGlobals.BRICK_HEIGHT);
             }
         }
-
 
         renderEntities();
         renderExtras();
