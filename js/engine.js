@@ -107,6 +107,7 @@ var Engine = (function(global) {
     function checkCollisions() {
         allEnemies.forEach(function(enemy) {
             if (collides(enemy.pos, player.pos, 50)) {
+              player.lives--;
               player.reset();
             }
         });
@@ -153,6 +154,7 @@ var Engine = (function(global) {
 
 
         renderEntities();
+        renderExtras();
     }
 
     /* This function is called by the render function and is called on each game
@@ -168,6 +170,23 @@ var Engine = (function(global) {
         });
 
         player.render();
+    }
+
+    function renderExtras() {
+
+        // clean
+        ctx.fillStyle = "white";
+        ctx.rect(0,0,510,40);
+        ctx.fill();
+
+        ctx.fillStyle = "blue";
+        ctx.font = "20px emulogic";
+        ctx.fillText("Score:", 0, 30);
+        ctx.fillText(player.score, 140, 30);
+        ctx.fillText("Lives:", 300, 30);
+
+        for (i = 0; i<player.lives; ++i)
+          ctx.drawImage(Resources.get('images/heart_small.png'), 420 + i*30,10);
     }
 
     /* This function does nothing but it could have been a good place to
@@ -187,7 +206,8 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/heart_small.png'
     ]);
     Resources.onReady(init);
 

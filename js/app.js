@@ -32,6 +32,9 @@ Enemy.prototype.update = function(dt) {
 var Player = function(sprite, pos) {
     Entity.call(this, sprite, [appGlobals.BRICK_WIDTH*2, appGlobals.BRICK_HEIGHT*5]);
     this.dir = [0,0];
+
+    this.lives = 3;
+    this.score = 0;
 }
 
 Player.prototype = Object.create(Entity.prototype);
@@ -44,6 +47,11 @@ Player.prototype.update = function(dt) {
     if (this.pos[1]+this.dir[1]>=appGlobals.BRICK_HEIGHT && this.pos[1]+this.dir[1]<appGlobals.HEIGHT-202)
         this.pos[1] += this.dir[1];
 
+    if (this.pos[1]+this.dir[1]<appGlobals.BRICK_HEIGHT) {
+        this.score++;
+        this.reset();
+    }
+    
     this.dir = [0,0];
 }
 
