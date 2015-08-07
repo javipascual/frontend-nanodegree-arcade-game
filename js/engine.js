@@ -17,8 +17,7 @@
  state = {
      RUN : 0,
      GAME_OVER : 1,
-     SELECT_PLAYER : 2,
-     EXPLODING : 3
+     SELECT_PLAYER : 2
  }
 
 var Engine = (function(global) {
@@ -99,21 +98,19 @@ var Engine = (function(global) {
     function update(dt) {
         updateEntities(dt);
 
-        if (game_state === state.EXPLODING)
-        {
-            playerExplosion.update(dt);
-            if (playerExplosion.step === playerExplosion.cols) {
+        if (player.exploding) {
+            player.explosion.update(dt);
+            if (player.explosionEnded()) {
                 if (player.lives<0)
                     game_state = state.GAME_OVER;
                 else
                     game_state = state.RUN;
-                playerExplosion.reset();
+
+                player.reset();
             }
         }
         else
             checkCollisions();
-
-
     }
 
     /* This is called by the update function  and loops through all of the
@@ -139,12 +136,8 @@ var Engine = (function(global) {
 
     function checkCollisions() {
         allEnemies.forEach(function(enemy) {
-            if (collides(enemy.pos, player.pos, 50)) {
-              player.lives--;
-              playerExplosion.pos = player.pos;
-              player.reset();
-              game_state = state.EXPLODING;
-            }
+            if (collides(enemy.pos, player.pos, 50))
+                player.die();
         });
     }
 
@@ -205,10 +198,7 @@ var Engine = (function(global) {
             enemy.render();
         });
 
-        if (game_state === state.EXPLODING)
-            playerExplosion.render();
-        else
-            player.render();
+        player.render();
     }
 
     function renderExtras() {
@@ -223,7 +213,7 @@ var Engine = (function(global) {
         ctx.fillText("Lives:", 300, 30);
 
         for (i = 0; i<player.lives; ++i)
-          ctx.drawImage(Resources.get('images/heart_small.png'), 420 + i*30,10);
+            ctx.drawImage(Resources.get('images/heart_small.png'), 420 + i*30,10);
     }
 
     /* This function does nothing but it could have been a good place to
@@ -245,7 +235,7 @@ var Engine = (function(global) {
         'images/enemy-bug.png',
         'images/char-boy.png',
         'images/heart_small.png',
-        'images/explosion-sprite-sheet.png'
+        'images/explosion-sprite-sheet.png' //from http://i-am-bryan.com/webs/wp-content/uploads/2012/12/Explosion-Sprite-Sheet.png
     ]);
     Resources.onReady(init);
 

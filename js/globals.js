@@ -14,5 +14,7 @@ var appGlobals = {
   MIN_SPEED: 3,
 
   MAX_POS: 606*0.6,
-  MIN_POS: 606*0.1
+  MIN_POS: 606*0.1,
+
+  MAX_LIVES: 3
 }

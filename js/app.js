@@ -1,21 +1,21 @@
 // Entity (superclass of enemies and player)
 
-var AnimEntity = function(sprite) {
+var AnimEntity = function(sprite, frames, size, dtFrame) {
     this.sprite = sprite;
-    this.pos;
-
+    this.pos = undefined;
     this.step = 0;
-
-    this.width=120;
-    this.height=120;
-    this.cols=5;
-    this.dtPerFrame = 0.07;
+    this.size = size;
+    this.cols = frames;
+    this.dtPerFrame = dtFrame;
     this.dt = 0;
 }
 
 AnimEntity.prototype.render = function() {
-    var x = this.step%(this.cols-1)*this.width;
-    ctx.drawImage(Resources.get(this.sprite),x,0,this.width,this.height,this.pos[0],this.pos[1],this.width,this.height);
+    var x = this.step%(this.cols-1)*this.size;
+    ctx.drawImage(Resources.get(this.sprite), x, 0,
+                  this.size, this.size,
+                  this.pos[0], this.pos[1],
+                  this.size, this.size);
 }
 
 AnimEntity.prototype.update = function(dt) {
@@ -54,7 +54,7 @@ Enemy.prototype = Object.create(Entity.prototype);
 
 Enemy.prototype.update = function(dt) {
     this.pos[0] += this.speed;
-    if (this.pos[0] > 505) {
+    if (this.pos[0] > appGlobals.WIDTH) {
         this.pos[0] = 0;
         this.speed = Math.random() * (appGlobals.MAX_SPEED - appGlobals.MIN_SPEED) + appGlobals.MIN_SPEED;
         this.pos[1] = Math.random() * (appGlobals.MAX_POS - appGlobals.MIN_POS) + appGlobals.MIN_POS;
@@ -66,13 +66,21 @@ var Player = function(sprite, pos) {
     Entity.call(this, sprite, [appGlobals.BRICK_WIDTH*2, appGlobals.BRICK_HEIGHT*5]);
     this.dir = [0,0];
 
-    this.lives = 3;
+    this.lives = appGlobals.MAX_LIVES;
     this.score = 0;
 
-    this.explosion_sprite = "../images/Explosion-Sprite-Sheet.png";
+    this.explosion = new AnimEntity('images/explosion-sprite-sheet.png', 5, 120, 0.08);
+    this.exploding = false;
 }
 
 Player.prototype = Object.create(Entity.prototype);
+
+Player.prototype.render = function() {
+    if (this.exploding)
+        this.explosion.render();
+    else
+        ctx.drawImage(Resources.get(this.sprite), this.pos[0], this.pos[1]);
+}
 
 Player.prototype.update = function(dt) {
 
@@ -89,9 +97,20 @@ Player.prototype.update = function(dt) {
 
     this.dir = [0,0];
 }
+Player.prototype.explosionEnded = function() {
+    return this.explosion.step === this.explosion.cols;
+}
+
+Player.prototype.die = function() {
+    this.exploding = true;
+    this.lives--;
+    this.explosion.pos = this.pos;
+}
 
 Player.prototype.reset = function() {
     this.pos = [appGlobals.BRICK_WIDTH*2, appGlobals.BRICK_HEIGHT*5];
+    this.exploding = false;
+    this.explosion.reset();
 }
 
 Player.prototype.handleInput = function(key) {
@@ -118,7 +137,6 @@ Player.prototype.handleInput = function(key) {
 
 var player = new Player('images/char-boy.png');
 var allEnemies = [];
-var playerExplosion = new AnimEntity('images/explosion-sprite-sheet.png');
 
 for (var i = 0; i < appGlobals.NENEMIES; i++)
     allEnemies.push(new Enemy('images/enemy-bug.png', [0,(i+1)*appGlobals.BRICK_HEIGHT]));
