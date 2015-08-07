@@ -193,9 +193,7 @@ var Engine = (function(global) {
     function renderExtras() {
 
         // clean
-        ctx.fillStyle = "white";
-        ctx.rect(0,0,510,40);
-        ctx.fill();
+        ctx.clearRect(0,0,510,40);
 
         ctx.fillStyle = "blue";
         ctx.font = "20px emulogic";
