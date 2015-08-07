@@ -1,4 +1,37 @@
 // Entity (superclass of enemies and player)
+
+var AnimEntity = function(sprite) {
+    this.sprite = sprite;
+    this.pos;
+
+    this.step = 0;
+
+    this.width=120;
+    this.height=120;
+    this.cols=5;
+    this.dtPerFrame = 0.07;
+    this.dt = 0;
+}
+
+AnimEntity.prototype.render = function() {
+    var x = this.step%(this.cols-1)*this.width;
+    ctx.drawImage(Resources.get(this.sprite),x,0,this.width,this.height,this.pos[0],this.pos[1],this.width,this.height);
+}
+
+AnimEntity.prototype.update = function(dt) {
+  this.dt += dt;
+
+  if (this.dt>this.dtPerFrame) {
+      this.step = this.step+1;
+      this.dt = 0;
+  }
+}
+
+AnimEntity.prototype.reset = function() {
+  this.dt = 0;
+  this.step = 0;
+}
+
 var Entity = function(sprite, pos) {
     this.sprite = sprite;
     this.pos = pos;
@@ -35,6 +68,8 @@ var Player = function(sprite, pos) {
 
     this.lives = 3;
     this.score = 0;
+
+    this.explosion_sprite = "../images/Explosion-Sprite-Sheet.png";
 }
 
 Player.prototype = Object.create(Entity.prototype);
@@ -51,7 +86,7 @@ Player.prototype.update = function(dt) {
         this.score++;
         this.reset();
     }
-    
+
     this.dir = [0,0];
 }
 
@@ -83,6 +118,7 @@ Player.prototype.handleInput = function(key) {
 
 var player = new Player('images/char-boy.png');
 var allEnemies = [];
+var playerExplosion = new AnimEntity('images/explosion-sprite-sheet.png');
 
 for (var i = 0; i < appGlobals.NENEMIES; i++)
     allEnemies.push(new Enemy('images/enemy-bug.png', [0,(i+1)*appGlobals.BRICK_HEIGHT]));

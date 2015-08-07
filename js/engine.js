@@ -17,7 +17,8 @@
  state = {
      RUN : 0,
      GAME_OVER : 1,
-     SELECT_PLAYER : 2
+     SELECT_PLAYER : 2,
+     EXPLODING : 3
  }
 
 var Engine = (function(global) {
@@ -52,7 +53,7 @@ var Engine = (function(global) {
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
          */
-        if (game_state === state.RUN) {
+        if (game_state != state.GAME_OVER) {
             update(dt);
         }
 
@@ -97,9 +98,22 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        checkCollisions();
-        if (player.lives<0)
-            game_state = state.GAME_OVER;
+
+        if (game_state === state.EXPLODING)
+        {
+            playerExplosion.update(dt);
+            if (playerExplosion.step === playerExplosion.cols) {
+                if (player.lives<0)
+                    game_state = state.GAME_OVER;
+                else
+                    game_state = state.RUN;
+                playerExplosion.reset();
+            }
+        }
+        else
+            checkCollisions();
+
+
     }
 
     /* This is called by the update function  and loops through all of the
@@ -127,7 +141,9 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             if (collides(enemy.pos, player.pos, 50)) {
               player.lives--;
+              playerExplosion.pos = player.pos;
               player.reset();
+              game_state = state.EXPLODING;
             }
         });
     }
@@ -171,7 +187,9 @@ var Engine = (function(global) {
             }
         }
 
-        renderEntities();
+        if (game_state != state.GAME_OVER)
+            renderEntities();
+
         renderExtras();
     }
 
@@ -187,7 +205,10 @@ var Engine = (function(global) {
             enemy.render();
         });
 
-        player.render();
+        if (game_state === state.EXPLODING)
+            playerExplosion.render();
+        else
+            player.render();
     }
 
     function renderExtras() {
@@ -223,7 +244,8 @@ var Engine = (function(global) {
         'images/grass-block.png',
         'images/enemy-bug.png',
         'images/char-boy.png',
-        'images/heart_small.png'
+        'images/heart_small.png',
+        'images/explosion-sprite-sheet.png'
     ]);
     Resources.onReady(init);
 
