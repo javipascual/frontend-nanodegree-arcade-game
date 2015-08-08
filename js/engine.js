@@ -161,7 +161,7 @@ var Engine = (function(global) {
 
     function checkCollisions() {
         allEnemies.forEach(function(enemy) {
-            if (collides(enemy.pos, player.pos, 6 0))
+            if (collides(enemy.pos, player.pos, 60))
                 player.die();
         });
     }
@@ -234,7 +234,7 @@ var Engine = (function(global) {
         ctx.clearRect(0,0,510,40);
 
         // draw score
-        ctx.fillStyle = "blue";
+        ctx.fillStyle = "#000080";
         ctx.font = "20px emulogic";
         ctx.fillText("Score:", 0, 30);
         ctx.fillText(player.score, 140, 30);
@@ -246,7 +246,7 @@ var Engine = (function(global) {
 
         // draw messages
         if (game_state === state.GAME_OVER) {
-            ctx.fillStyle = "blue";
+            ctx.fillStyle = "#000080";
             ctx.font = "50px emulogic";
             ctx.fillText("GAME OVER", 25, appGlobals.HEIGHT/2);
             ctx.font = "20px emulogic";
