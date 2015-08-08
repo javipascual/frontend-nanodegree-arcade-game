@@ -79,7 +79,7 @@ Player.prototype.render = function() {
     if (this.exploding)
         this.explosion.render();
     else
-        ctx.drawImage(Resources.get(this.sprite), this.pos[0], this.pos[1]);
+        Entity.prototype.render.call(this);
 }
 
 Player.prototype.update = function(dt) {
