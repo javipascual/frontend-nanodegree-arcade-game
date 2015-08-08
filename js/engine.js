@@ -64,6 +64,7 @@ var Engine = (function(global) {
         if (game_state == state.GAME_OVER) {
             playerSelector.reset();
             player.lives = appGlobals.MAX_LIVES;
+            player.score = 0;
             game_state = state.SELECT_PLAYER;
         }
     }
@@ -83,23 +84,10 @@ var Engine = (function(global) {
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
          */
-        if (game_state != state.GAME_OVER) {
+        if (game_state == state.RUN)
             update(dt);
-        }
 
         render();
-
-        if (game_state === state.GAME_OVER) {
-            ctx.fillStyle = "blue";
-            ctx.font = "50px emulogic";
-            ctx.fillText("GAME OVER", 25, appGlobals.HEIGHT/2);
-            ctx.font = "20px emulogic";
-            ctx.fillText("press click to continue", 25, appGlobals.HEIGHT/2 + 50);
-        }
-        else if (game_state === state.SELECT_PLAYER) {
-            ctx.font = "30px emulogic";
-            ctx.fillText("SELECT PLAYER", 60, appGlobals.HEIGHT/3);
-        }
 
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
@@ -255,6 +243,18 @@ var Engine = (function(global) {
 
         for (i = 0; i<player.lives; ++i)
             ctx.drawImage(Resources.get('images/heart_small.png'), 420 + i*30,10);
+
+        if (game_state === state.GAME_OVER) {
+            ctx.fillStyle = "blue";
+            ctx.font = "50px emulogic";
+            ctx.fillText("GAME OVER", 25, appGlobals.HEIGHT/2);
+            ctx.font = "20px emulogic";
+            ctx.fillText("press click to continue", 25, appGlobals.HEIGHT/2 + 50);
+        }
+        else if (game_state === state.SELECT_PLAYER) {
+            ctx.font = "30px emulogic";
+            ctx.fillText("SELECT PLAYER", 60, appGlobals.HEIGHT/3);
+        }
     }
 
     /* This function does nothing but it could have been a good place to

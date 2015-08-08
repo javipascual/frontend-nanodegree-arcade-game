@@ -127,10 +127,10 @@ Player.prototype.update = function(dt) {
     if (this.pos[0]+this.dir[0]>=0 && this.pos[0]+this.dir[0]<appGlobals.WIDTH)
         this.pos[0] += this.dir[0];
 
-    if (this.pos[1]+this.dir[1]>=appGlobals.BRICK_HEIGHT && this.pos[1]+this.dir[1]<appGlobals.HEIGHT-202)
+    if (this.pos[1]+this.dir[1]>=0 && this.pos[1]+this.dir[1]<appGlobals.HEIGHT-150)
         this.pos[1] += this.dir[1];
 
-    if (this.pos[1]+this.dir[1]<appGlobals.BRICK_HEIGHT) {
+    if (this.pos[1]<appGlobals.BRICK_HEIGHT) {
         this.score++;
         this.reset();
     }
@@ -149,12 +149,13 @@ Player.prototype.die = function() {
 
 Player.prototype.reset = function() {
     this.pos = [appGlobals.BRICK_WIDTH*2, appGlobals.BRICK_HEIGHT*5];
-    this.score = 0;
     this.exploding = false;
     this.explosion.reset();
 }
 
 Player.prototype.handleInput = function(key) {
+
+  if (this.exploding) return;
 
   switch(key) {
     case 'left':
@@ -184,6 +185,7 @@ var allEnemies = [];
 for (var i = 0; i < appGlobals.NENEMIES; i++)
     allEnemies.push(new Enemy('images/enemy-bug.png', [0,(i+1)*appGlobals.BRICK_HEIGHT]));
 
+// used when the engine is in SELECT_PLAYER state
 var playerSelector = new PlayerSelector('images/selector.png',['images/char-boy.png',
                                                                'images/char-cat-girl.png',
                                                                'images/char-horn-girl.png',
