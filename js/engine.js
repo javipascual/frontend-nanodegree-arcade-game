@@ -30,16 +30,42 @@ var Engine = (function(global) {
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
         lastTime,
-        game_state;
+        game_state = state.SELECT_PLAYER;
 
     canvas.width = appGlobals.WIDTH;
     canvas.height = appGlobals.HEIGHT;
     doc.body.appendChild(canvas);
     doc.addEventListener("click", on_click);
+    // This listens for key presses and sends the keys to your
+    // Player.handleInput() method. You don't need to modify this.
+    doc.addEventListener('keyup', onKey);
+
+    playerSelector.onSelect = function(c) {
+        game_state = state.RUN;
+        player.sprite = c;
+    };
+
+    function onKey(e) {
+        var allowedKeys = {
+            13: 'enter',
+            37: 'left',
+            38: 'up',
+            39: 'right',
+            40: 'down'
+        };
+
+        if (game_state === state.SELECT_PLAYER)
+            playerSelector.handleInput(allowedKeys[e.keyCode]);
+        else if (game_state === state.RUN)
+            player.handleInput(allowedKeys[e.keyCode]);
+    }
 
     function on_click() {
-        if (game_state == state.GAME_OVER)
-            game_state = state.RUN;
+        if (game_state == state.GAME_OVER) {
+            playerSelector.reset();
+            player.lives = appGlobals.MAX_LIVES;
+            game_state = state.SELECT_PLAYER;
+        }
     }
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
@@ -70,6 +96,10 @@ var Engine = (function(global) {
             ctx.font = "20px emulogic";
             ctx.fillText("press click to continue", 25, appGlobals.HEIGHT/2 + 50);
         }
+        else if (game_state === state.SELECT_PLAYER) {
+            ctx.font = "30px emulogic";
+            ctx.fillText("SELECT PLAYER", 60, appGlobals.HEIGHT/3);
+        }
 
         /* Set our lastTime variable which is used to determine the time delta
          * for the next time this function is called.
@@ -88,7 +118,7 @@ var Engine = (function(global) {
      */
     function init() {
         reset();
-        game_state = state.RUN;
+        game_state = state.SELECT_PLAYER;
         lastTime = Date.now();
         main();
     }
@@ -103,7 +133,8 @@ var Engine = (function(global) {
      * on the entities themselves within your app.js file).
      */
     function update(dt) {
-        updateEntities(dt);
+        if (game_state === state.RUN)
+            updateEntities(dt);
 
         if (player.exploding) {
             player.explosion.update(dt);
@@ -187,9 +218,7 @@ var Engine = (function(global) {
             }
         }
 
-        if (game_state != state.GAME_OVER)
-            renderEntities();
-
+        renderEntities();
         renderExtras();
     }
 
@@ -201,11 +230,16 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
-        allEnemies.forEach(function(enemy) {
-            enemy.render();
-        });
 
-        player.render();
+        if (game_state === state.RUN) {
+            allEnemies.forEach(function(enemy) {
+                enemy.render();
+            });
+
+            player.render();
+        }
+        else if (game_state === state.SELECT_PLAYER)
+            playerSelector.render();
     }
 
     function renderExtras() {
@@ -242,7 +276,12 @@ var Engine = (function(global) {
         'images/enemy-bug.png',
         'images/char-boy.png',
         'images/heart_small.png',
-        'images/explosion-sprite-sheet.png' //from http://i-am-bryan.com/webs/wp-content/uploads/2012/12/Explosion-Sprite-Sheet.png
+        'images/explosion-sprite-sheet.png', //from http://i-am-bryan.com/webs/wp-content/uploads/2012/12/Explosion-Sprite-Sheet.png
+        'images/selector.png',
+        'images/char-cat-girl.png',
+        'images/char-horn-girl.png',
+        'images/char-pink-girl.png',
+        'images/char-princess-girl.png'
     ]);
     Resources.onReady(init);
 

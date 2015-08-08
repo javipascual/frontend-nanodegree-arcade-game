@@ -1,5 +1,45 @@
-// Entity (superclass of enemies and player)
+var PlayerSelector = function(frame_sprite, char_sprites) {
+    this.frame_sprite = frame_sprite;
+    this.char_sprites = char_sprites;
+    this.char = 0;
+    this.pos = [0, appGlobals.HEIGHT/3];
+    this.selected = false;
+    this.onSelect = undefined;
+}
 
+PlayerSelector.prototype.reset = function() {
+    this.char = 0;
+    this.selected = false;
+}
+
+PlayerSelector.prototype.render = function() {
+    var charOffset = appGlobals.WIDTH/this.char_sprites.length;
+
+    ctx.drawImage(Resources.get(this.frame_sprite), this.pos[0]+this.char*charOffset, this.pos[1]);
+
+    for (i = 0; i < this.char_sprites.length; i++)
+        ctx.drawImage(Resources.get(this.char_sprites[i]), this.pos[0]+i*charOffset, this.pos[1]);
+}
+
+PlayerSelector.prototype.handleInput = function(key) {
+
+  switch(key) {
+    case 'left':
+        if (!this.selected && this.char-1 >=0)
+            this.char--;
+        break;
+    case 'right':
+        if (!this.selected && this.char+1 < this.char_sprites.length)
+            this.char++;
+        break;
+    case 'enter':
+        this.selected = true;
+        this.onSelect(this.char_sprites[this.char]);
+        break;
+  }
+}
+
+// Animation
 var AnimEntity = function(sprite, frames, size, dtFrame) {
     this.sprite = sprite;
     this.pos = undefined;
@@ -132,6 +172,8 @@ Player.prototype.handleInput = function(key) {
   }
 }
 
+
+
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
@@ -142,15 +184,8 @@ var allEnemies = [];
 for (var i = 0; i < appGlobals.NENEMIES; i++)
     allEnemies.push(new Enemy('images/enemy-bug.png', [0,(i+1)*appGlobals.BRICK_HEIGHT]));
 
-// This listens for key presses and sends the keys to your
-// Player.handleInput() method. You don't need to modify this.
-document.addEventListener('keyup', function(e) {
-    var allowedKeys = {
-        37: 'left',
-        38: 'up',
-        39: 'right',
-        40: 'down'
-    };
-
-    player.handleInput(allowedKeys[e.keyCode]);
-});
+var playerSelector = new PlayerSelector('images/selector.png',['images/char-boy.png',
+                                                               'images/char-cat-girl.png',
+                                                               'images/char-horn-girl.png',
+                                                               'images/char-pink-girl.png',
+                                                               'images/char-princess-girl.png']);
