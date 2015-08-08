@@ -109,6 +109,7 @@ Player.prototype.die = function() {
 
 Player.prototype.reset = function() {
     this.pos = [appGlobals.BRICK_WIDTH*2, appGlobals.BRICK_HEIGHT*5];
+    this.score = 0;
     this.exploding = false;
     this.explosion.reset();
 }

@@ -35,7 +35,12 @@ var Engine = (function(global) {
     canvas.width = appGlobals.WIDTH;
     canvas.height = appGlobals.HEIGHT;
     doc.body.appendChild(canvas);
+    doc.addEventListener("click", on_click);
 
+    function on_click() {
+        if (game_state == state.GAME_OVER)
+            game_state = state.RUN;
+    }
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
@@ -62,6 +67,8 @@ var Engine = (function(global) {
             ctx.fillStyle = "blue";
             ctx.font = "50px emulogic";
             ctx.fillText("GAME OVER", 25, appGlobals.HEIGHT/2);
+            ctx.font = "20px emulogic";
+            ctx.fillText("press click to continue", 25, appGlobals.HEIGHT/2 + 50);
         }
 
         /* Set our lastTime variable which is used to determine the time delta
