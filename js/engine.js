@@ -63,8 +63,7 @@ var Engine = (function(global) {
     function on_click() {
         if (game_state == state.GAME_OVER) {
             playerSelector.reset();
-            player.lives = appGlobals.MAX_LIVES;
-            player.score = 0;
+            player.restart();
             game_state = state.SELECT_PLAYER;
         }
     }
@@ -162,7 +161,7 @@ var Engine = (function(global) {
 
     function checkCollisions() {
         allEnemies.forEach(function(enemy) {
-            if (collides(enemy.pos, player.pos, 50))
+            if (collides(enemy.pos, player.pos, 6 0))
                 player.die();
         });
     }
@@ -218,7 +217,6 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
-
         if (game_state === state.RUN) {
             allEnemies.forEach(function(enemy) {
                 enemy.render();
@@ -235,15 +233,18 @@ var Engine = (function(global) {
         // clean
         ctx.clearRect(0,0,510,40);
 
+        // draw score
         ctx.fillStyle = "blue";
         ctx.font = "20px emulogic";
         ctx.fillText("Score:", 0, 30);
         ctx.fillText(player.score, 140, 30);
-        ctx.fillText("Lives:", 300, 30);
 
+        // draw lives
+        ctx.fillText("Lives:", 300, 30);
         for (i = 0; i<player.lives; ++i)
             ctx.drawImage(Resources.get('images/heart_small.png'), 420 + i*30,10);
 
+        // draw messages
         if (game_state === state.GAME_OVER) {
             ctx.fillStyle = "blue";
             ctx.font = "50px emulogic";

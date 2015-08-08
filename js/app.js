@@ -1,6 +1,7 @@
-var PlayerSelector = function(frame_sprite, char_sprites) {
-    this.frame_sprite = frame_sprite;
-    this.char_sprites = char_sprites;
+// class to select a player
+var PlayerSelector = function(frameSprite, charSprites) {
+    this.frameSprite = frameSprite;
+    this.charSprites = charSprites;
     this.char = 0;
     this.pos = [0, appGlobals.HEIGHT/3];
     this.selected = false;
@@ -13,12 +14,16 @@ PlayerSelector.prototype.reset = function() {
 }
 
 PlayerSelector.prototype.render = function() {
-    var charOffset = appGlobals.WIDTH/this.char_sprites.length;
 
-    ctx.drawImage(Resources.get(this.frame_sprite), this.pos[0]+this.char*charOffset, this.pos[1]);
+    var len = this.charSprites.length;
+    var charOffset = appGlobals.WIDTH/len;
 
-    for (i = 0; i < this.char_sprites.length; i++)
-        ctx.drawImage(Resources.get(this.char_sprites[i]), this.pos[0]+i*charOffset, this.pos[1]);
+    // draw the selection box
+    ctx.drawImage(Resources.get(this.frameSprite), this.pos[0]+this.char*charOffset, this.pos[1]);
+
+    // draw all the characters
+    for (i = 0; i < len; i++)
+        ctx.drawImage(Resources.get(this.charSprites[i]), this.pos[0]+i*charOffset, this.pos[1]);
 }
 
 PlayerSelector.prototype.handleInput = function(key) {
@@ -29,17 +34,17 @@ PlayerSelector.prototype.handleInput = function(key) {
             this.char--;
         break;
     case 'right':
-        if (!this.selected && this.char+1 < this.char_sprites.length)
+        if (!this.selected && this.char+1 < this.charSprites.length)
             this.char++;
         break;
     case 'enter':
         this.selected = true;
-        this.onSelect(this.char_sprites[this.char]);
+        this.onSelect(this.charSprites[this.char]);
         break;
   }
 }
 
-// Animation
+// Animation of a sprite 1-D array
 var AnimEntity = function(sprite, frames, size, dtFrame) {
     this.sprite = sprite;
     this.pos = undefined;
@@ -51,7 +56,10 @@ var AnimEntity = function(sprite, frames, size, dtFrame) {
 }
 
 AnimEntity.prototype.render = function() {
+    // calculate the position of the sprite to draw
     var x = this.step%(this.cols-1)*this.size;
+
+    // draw the part of the sprite
     ctx.drawImage(Resources.get(this.sprite), x, 0,
                   this.size, this.size,
                   this.pos[0], this.pos[1],
@@ -72,6 +80,7 @@ AnimEntity.prototype.reset = function() {
   this.step = 0;
 }
 
+// Superclass for enemies and player
 var Entity = function(sprite, pos) {
     this.sprite = sprite;
     this.pos = pos;
@@ -124,12 +133,14 @@ Player.prototype.render = function() {
 
 Player.prototype.update = function(dt) {
 
+    // check boundaries
     if (this.pos[0]+this.dir[0]>=0 && this.pos[0]+this.dir[0]<appGlobals.WIDTH)
         this.pos[0] += this.dir[0];
 
     if (this.pos[1]+this.dir[1]>=0 && this.pos[1]+this.dir[1]<appGlobals.HEIGHT-150)
         this.pos[1] += this.dir[1];
 
+    // check if player reached the goal
     if (this.pos[1]<appGlobals.BRICK_HEIGHT) {
         this.score++;
         this.reset();
@@ -137,6 +148,7 @@ Player.prototype.update = function(dt) {
 
     this.dir = [0,0];
 }
+
 Player.prototype.explosionEnded = function() {
     return this.explosion.step === this.explosion.cols;
 }
@@ -151,6 +163,11 @@ Player.prototype.reset = function() {
     this.pos = [appGlobals.BRICK_WIDTH*2, appGlobals.BRICK_HEIGHT*5];
     this.exploding = false;
     this.explosion.reset();
+}
+
+Player.prototype.restart = function() {
+    this.lives = appGlobals.MAX_LIVES;
+    this.score = 0;
 }
 
 Player.prototype.handleInput = function(key) {
