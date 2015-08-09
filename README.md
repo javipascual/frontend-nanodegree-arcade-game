@@ -1,6 +1,7 @@
 frontend-nanodegree-arcade-game
 ===============================
 
-Students should use this rubric: https://www.udacity.com/course/viewer#!/c-ud015/l-3072058665/m-3072588797
+In this game you have a Player and Enemies (Bugs).
+The goal of the player is to reach the water, without colliding into any one of the enemies.
 
-for self-checking their submission.
+Use the arrows `left`, `right`, `up` and `down` to move the player.

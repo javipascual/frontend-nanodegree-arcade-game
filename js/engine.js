@@ -14,6 +14,12 @@
  * a little simpler to work with.
  */
 
+ state = {
+     RUN : 0,
+     GAME_OVER : 1,
+     SELECT_PLAYER : 2
+ }
+
 var Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
@@ -23,12 +29,44 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        lastTime;
+        lastTime,
+        game_state = state.SELECT_PLAYER;
 
-    canvas.width = 505;
-    canvas.height = 606;
+    canvas.width = appGlobals.WIDTH;
+    canvas.height = appGlobals.HEIGHT;
     doc.body.appendChild(canvas);
+    doc.addEventListener("click", on_click);
+    // This listens for key presses and sends the keys to your
+    // Player.handleInput() method. You don't need to modify this.
+    doc.addEventListener('keyup', onKey);
 
+    playerSelector.onSelect = function(c) {
+        game_state = state.RUN;
+        player.sprite = c;
+    };
+
+    function onKey(e) {
+        var allowedKeys = {
+            13: 'enter',
+            37: 'left',
+            38: 'up',
+            39: 'right',
+            40: 'down'
+        };
+
+        if (game_state === state.SELECT_PLAYER)
+            playerSelector.handleInput(allowedKeys[e.keyCode]);
+        else if (game_state === state.RUN)
+            player.handleInput(allowedKeys[e.keyCode]);
+    }
+
+    function on_click() {
+        if (game_state == state.GAME_OVER) {
+            playerSelector.reset();
+            player.restart();
+            game_state = state.SELECT_PLAYER;
+        }
+    }
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
@@ -45,7 +83,9 @@ var Engine = (function(global) {
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
          */
-        update(dt);
+        if (game_state == state.RUN)
+            update(dt);
+
         render();
 
         /* Set our lastTime variable which is used to determine the time delta
@@ -65,6 +105,7 @@ var Engine = (function(global) {
      */
     function init() {
         reset();
+        game_state = state.SELECT_PLAYER;
         lastTime = Date.now();
         main();
     }
@@ -79,8 +120,22 @@ var Engine = (function(global) {
      * on the entities themselves within your app.js file).
      */
     function update(dt) {
-        updateEntities(dt);
-        // checkCollisions();
+        if (game_state === state.RUN)
+            updateEntities(dt);
+
+        if (player.exploding) {
+            player.explosion.update(dt);
+            if (player.explosionEnded()) {
+                if (player.lives<0)
+                    game_state = state.GAME_OVER;
+                else
+                    game_state = state.RUN;
+
+                player.reset();
+            }
+        }
+        else
+            checkCollisions();
     }
 
     /* This is called by the update function  and loops through all of the
@@ -95,6 +150,20 @@ var Engine = (function(global) {
             enemy.update(dt);
         });
         player.update();
+    }
+
+    function collides(pos, pos2, size) {
+        return (pos[0] + size > pos2[0] &&
+                pos[0] < pos2[0] + size &&
+                pos[1] + size > pos2[1] &&
+                pos[1] < pos2[1] + size);
+    }
+
+    function checkCollisions() {
+        allEnemies.forEach(function(enemy) {
+            if (collides(enemy.pos, player.pos, 60))
+                player.die();
+        });
     }
 
     /* This function initially draws the "game level", it will then call
@@ -123,8 +192,8 @@ var Engine = (function(global) {
          * and, using the rowImages array, draw the correct image for that
          * portion of the "grid"
          */
-        for (row = 0; row < numRows; row++) {
-            for (col = 0; col < numCols; col++) {
+        for (row = 0; row < appGlobals.NUM_ROWS; row++) {
+            for (col = 0; col < appGlobals.NUM_COLS; col++) {
                 /* The drawImage function of the canvas' context element
                  * requires 3 parameters: the image to draw, the x coordinate
                  * to start drawing and the y coordinate to start drawing.
@@ -132,12 +201,12 @@ var Engine = (function(global) {
                  * so that we get the benefits of caching these images, since
                  * we're using them over and over.
                  */
-                ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
+                ctx.drawImage(Resources.get(rowImages[row]), col * appGlobals.BRICK_WIDTH, row * appGlobals.BRICK_HEIGHT);
             }
         }
 
-
         renderEntities();
+        renderExtras();
     }
 
     /* This function is called by the render function and is called on each game
@@ -148,11 +217,45 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
-        allEnemies.forEach(function(enemy) {
-            enemy.render();
-        });
+        if (game_state === state.RUN) {
+            allEnemies.forEach(function(enemy) {
+                enemy.render();
+            });
 
-        player.render();
+            player.render();
+        }
+        else if (game_state === state.SELECT_PLAYER)
+            playerSelector.render();
+    }
+
+    function renderExtras() {
+
+        // clean
+        ctx.clearRect(0,0,510,40);
+
+        // draw score
+        ctx.fillStyle = "#000080";
+        ctx.font = "20px emulogic";
+        ctx.fillText("Score:", 0, 30);
+        ctx.fillText(player.score, 140, 30);
+
+        // draw lives
+        ctx.fillText("Lives:", 300, 30);
+        for (i = 0; i<player.lives; ++i)
+            ctx.drawImage(Resources.get('images/heart_small.png'), 420 + i*30,10);
+
+        // draw messages
+        if (game_state === state.GAME_OVER) {
+            ctx.fillStyle = "#000080";
+            ctx.font = "50px emulogic";
+            ctx.fillText("GAME OVER", 25, appGlobals.HEIGHT/2);
+            ctx.font = "20px emulogic";
+            ctx.fillText("press click to continue", 25, appGlobals.HEIGHT/2 + 50);
+        }
+        else if (game_state === state.SELECT_PLAYER) {
+            ctx.font = "30px emulogic";
+            ctx.fillText("SELECT PLAYER", 60, appGlobals.HEIGHT/3);
+        }
     }
 
     /* This function does nothing but it could have been a good place to
@@ -172,7 +275,14 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/heart_small.png',
+        'images/explosion-sprite-sheet.png', //from http://i-am-bryan.com/webs/wp-content/uploads/2012/12/Explosion-Sprite-Sheet.png
+        'images/selector.png',
+        'images/char-cat-girl.png',
+        'images/char-horn-girl.png',
+        'images/char-pink-girl.png',
+        'images/char-princess-girl.png'
     ]);
     Resources.onReady(init);
 
