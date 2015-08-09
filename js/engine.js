@@ -1,3 +1,5 @@
+"use strict";
+
 /* Engine.js
  * This file provides the game loop functionality (update entities and render),
  * draws the initial game board on the screen, and then calls the update and
@@ -14,11 +16,11 @@
  * a little simpler to work with.
  */
 
- state = {
-     RUN : 0,
-     GAME_OVER : 1,
-     SELECT_PLAYER : 2
- }
+var state = {
+    RUN : 0,
+    GAME_OVER : 1,
+    SELECT_PLAYER : 2
+};
 
 var Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
@@ -67,6 +69,7 @@ var Engine = (function(global) {
             game_state = state.SELECT_PLAYER;
         }
     }
+
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
@@ -97,7 +100,7 @@ var Engine = (function(global) {
          * function again as soon as the browser is able to draw another frame.
          */
         win.requestAnimationFrame(main);
-    };
+    }
 
     /* This function does some initial setup that should only occur once,
      * particularly setting the lastTime variable that is required for the
@@ -184,8 +187,6 @@ var Engine = (function(global) {
                 'images/grass-block.png',   // Row 1 of 2 of grass
                 'images/grass-block.png'    // Row 2 of 2 of grass
             ],
-            numRows = 6,
-            numCols = 5,
             row, col;
 
         /* Loop through the number of rows and columns we've defined above
@@ -241,7 +242,7 @@ var Engine = (function(global) {
 
         // draw lives
         ctx.fillText("Lives:", 300, 30);
-        for (i = 0; i<player.lives; ++i)
+        for (var i = 0; i<player.lives; ++i)
             ctx.drawImage(Resources.get('images/heart_small.png'), 420 + i*30,10);
 
         // draw messages
@@ -278,7 +279,7 @@ var Engine = (function(global) {
         'images/char-boy.png',
         'images/heart_small.png',
         'images/explosion-sprite-sheet.png', //from http://i-am-bryan.com/webs/wp-content/uploads/2012/12/Explosion-Sprite-Sheet.png
-        'images/selector.png',
+        'images/Selector.png',
         'images/char-cat-girl.png',
         'images/char-horn-girl.png',
         'images/char-pink-girl.png',
