@@ -1,8 +1,15 @@
-frontend nanodegree arcade game
+Frontend nanodegree arcade game
 ===============================
 
 In this game you have a Player and Enemies (Bugs).
 The goal of the player is to reach the water, without colliding into any one of the enemies.
+
+
+## Run Instructions
+
+In order to play the game, click on [me!](http://rawgit.com/javipascual/frontend-nanodegree-arcade-game/master/index.html)
+and enjoy :)
+
 
 ## Game Instructions
 
